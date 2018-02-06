@@ -2,7 +2,7 @@
 Screen Capture for Chrome and Firefox
 ### For Google Chrome ###
 1. You must access **chrome://extensions**, enable the **Developer Mode** then click on **Load Unpacked Extension** and select the folder **screen-capture-chrome**.
-2. After that you need to get the **ID** from your newly loaded extension and replace the variable **EXTENSION_ID** from the file **www/assets/js/index.js** on line **29** to your own EXTENSION_ID.
+2. After that you need to get the **ID** from your newly loaded extension and replace the variable **EXTENSION_ID** on the file **www/assets/js/index.js** at line **45** to your own EXTENSION_ID.
 
 ### For Firefox ###
 * You don't have to change anything, however **it only works with HTTPS**.

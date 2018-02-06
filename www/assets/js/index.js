@@ -15,34 +15,42 @@ const captureScreen = constraint => {
     .catch(error)
 }
 
-if (navigator.mediaDevices.getSupportedConstraints().mediaSource) {
-  console.log('For Firefox')
-  if ('getUserMedia' in navigator.mediaDevices) {
-    captureScreen({
-      video: {
-        mediaSource: 'screen'
-      }
-    })
-  }
-} else {
-  console.log('For Chrome')
-  const EXTENSION_ID = 'meiohbiickddgmgomjpnpcjemkdgbkmg'
-  const request = {
-    sources: ['window' ,'screen', 'tab']
-  }
+let constraint = { video: null}
 
-  chrome.runtime.sendMessage(EXTENSION_ID, request, response => {
-    if (response && response.type === 'success') {
-      captureScreen({
-        video: {
+const getStreamId = (extensionId, req) => {
+  return new Promise((resolve, reject) => {
+    chrome.runtime.sendMessage(extensionId, req, response => {
+      if (response && response.type === 'success') {
+        constraint.video = {
           mandatory: {
             chromeMediaSource: 'desktop',
             chromeMediaSourceId: response.streamId,
           }
         }
-      })
-    } else {
-      console.log('Could not get stream')
-    }
+        resolve('Got streamId')
+      } else {
+        console.log('Could not get stream')
+        reject('Could not get streamId')
+      }
+    })
   })
 }
+
+(async () => {
+  if (navigator.mediaDevices.getSupportedConstraints().mediaSource) {
+    if ('getUserMedia' in navigator.mediaDevices) {
+      constraint.video = { mediaSource: 'window' }
+    }
+  } else {
+    const EXTENSION_ID = 'meiohbiickddgmgomjpnpcjemkdgbkmg'
+    const request = {
+      sources: ['window' ,'screen', 'tab']
+    }
+    try {
+      await getStreamId(EXTENSION_ID, request)
+    } catch (err) {
+      console.log(err)
+    }
+  }
+  captureScreen(constraint)
+})()
